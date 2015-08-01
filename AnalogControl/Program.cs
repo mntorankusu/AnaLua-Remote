@@ -43,6 +43,8 @@ namespace AnalogControl
             var lanalogbuffery = 0;
             var ranalogbufferx = 0;
             var ranalogbuffery = 0;
+            var ltriggerbuffer = 0;
+            var rtriggerbuffer = 0;
             var buttons1 = Convert.ToByte("00000000", 2);
             var buttons2 = Convert.ToByte("00000000", 2);
 
@@ -80,38 +82,26 @@ namespace AnalogControl
             {
                 js.GetCurrentState(ref jss);
 
-                lanalogbufferx = (jss.X*255)/65500;
-                lanalogbuffery = (jss.Y*255)/65500;
-
-                ranalogbufferx = (jss.RotationX*255)/65500;
-                ranalogbuffery = (jss.RotationY*255)/65500;
-
-                for(int i = 0; i < ActiveEffects.Count; i++)
+                try
                 {
-                    Vibration vib = new Vibration();
-                    try
-                    {
-                        vib.LeftMotorSpeed = (ushort) (ActiveEffects[i].values[ActiveEffects[i].counter].X*65535);
-                    }
-                    catch
-                    {
-                    }
-                    xinp.SetVibration(vib);
-                    ActiveEffects[i].counter++;
+                    lanalogbufferx = (xinp.GetState().Gamepad.LeftThumbX + 32768)/256;
+                    lanalogbuffery = (xinp.GetState().Gamepad.LeftThumbY + 32768)/256;
+
+                    ranalogbufferx = (xinp.GetState().Gamepad.RightThumbX + 32768)/256;
+                    ranalogbuffery = (xinp.GetState().Gamepad.RightThumbY + 32768)/256;
+
+                    ltriggerbuffer = (xinp.GetState().Gamepad.LeftTrigger)/2;
+                    rtriggerbuffer = (xinp.GetState().Gamepad.RightTrigger)/2;
+
+                    xinp.SetVibration(P1VibrationOutput);
+                }
+                catch
+                {
                 }
 
-                for (int i = 0; i < ActiveEffects.Count; i++)
-                {
-                    if (ActiveEffects[i].counter > ActiveEffects[i].values.Length)
-                    {
-                        ActiveEffects.RemoveAt(i);
-                    }
-                }
-
-                
-
-                //Console.WriteLine("LS - X: {0}, Y: {0} -- ", lanalogbufferx, lanalogbuffery);
-                //Console.Write("RS - X: {0}, Y: {0}", ranalogbufferx, ranalogbuffery);
+                Console.WriteLine("LS - X: {0}, Y: {0} -- ", lanalogbufferx, lanalogbuffery);
+                Console.Write("RS - X: {0}, Y: {0}", ranalogbufferx, ranalogbuffery);
+                Console.CursorTop--;
 
                 P1VibrationOutput.LeftMotorSpeed = 0;
                 P1VibrationOutput.RightMotorSpeed = 0;
@@ -140,7 +130,8 @@ namespace AnalogControl
                         
                     }
                 }
-                xinp.SetVibration(P1VibrationOutput);
+
+                
 
 
                 //if (udpbuf[0].ToString())
@@ -159,6 +150,8 @@ namespace AnalogControl
                 sendbuffer[2] = (byte) lanalogbuffery;
                 sendbuffer[3] = (byte) ranalogbufferx;
                 sendbuffer[4] = (byte) ranalogbuffery;
+                sendbuffer[5] = (byte) ltriggerbuffer;
+                sendbuffer[6] = (byte) rtriggerbuffer;
 
                 if (udp.Send(sendbuffer, 9, ip) > 0)
                 {
