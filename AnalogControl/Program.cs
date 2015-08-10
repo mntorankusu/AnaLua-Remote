@@ -12,22 +12,44 @@ namespace AnalogControl
 {
     internal class Program
     {
+        static List<Controller> xinputcontrollers = new List<Controller>();
+        static public int XInpPlayerIndex = -1;
+
+        public static UInt16 Port = 0;
+
+        public static IPAddress outaddress;
+
+        public void UpdateItems(MainWindow window)
+        {
+            
+        }
+
         [STAThread]
         private static void Main(string[] args)
         {
-            Application.EnableVisualStyles(); 
+            Application.EnableVisualStyles();
+            MainWindow TheMainForm = new MainWindow();
 
-            //Application.Run(new Form());
+            for (int i = 0; i <= 3; i++)
+            {
+                if (new Controller((UserIndex)i).IsConnected)
+                {
+                    xinputcontrollers.Add(new Controller((UserIndex)i));
+                    TheMainForm.AddItemToComboBox(String.Format("Xinput Controller (Player Index {0})", i+1));
+                }
+            }
 
-            var xinp = new Controller(UserIndex.One);
+            Application.Run(TheMainForm);
+
+            Controller xinp = xinputcontrollers[XInpPlayerIndex];
 
             var P1VibrationOutput = new Vibration();
-
+            
             List<VibrationEffect> ActiveEffects = new List<VibrationEffect>();
 
             var di = new DirectInput();
             var devices = di.GetDevices(DeviceClass.GameControl, DeviceEnumerationFlags.AttachedOnly);
-            var ip = new IPEndPoint(IPAddress.Loopback, 3478);
+            IPEndPoint ip = new IPEndPoint(outaddress, Port);
             var udp = new UdpClient(ip);
 
             foreach (var dev in devices)
@@ -35,9 +57,6 @@ namespace AnalogControl
                 Console.WriteLine(dev.ProductName);
             }
             var udpbuf = new byte[1];
-
-            var js = new Joystick(di, devices[0].InstanceGuid);
-            var jss = new JoystickState();
 
             var lanalogbufferx = 0;
             var lanalogbuffery = 0;
@@ -68,35 +87,29 @@ namespace AnalogControl
             //L, R, LT, RT, LS, RS, Select, Start
             //Mouse Left, Mouse Right, Mouse Middle, Mouse scroll up, Mouse scroll down, X1, X2
 
-            js.Acquire();
-
-            Console.WriteLine(js.GetEffects().Count);
-
-            js.GetCurrentState(ref jss);
-
             Console.WriteLine("AnaLua Controller Server (Generic Version 0.01)");
             Console.WriteLine("Sends input from the first connected controller to localhost:3478");
             Console.WriteLine("And receives force feedback commands on the same port.");
 
             while (true)
             {
-                js.GetCurrentState(ref jss);
 
                 try
                 {
-                    lanalogbufferx = (xinp.GetState().Gamepad.LeftThumbX + 32768)/256;
-                    lanalogbuffery = (xinp.GetState().Gamepad.LeftThumbY + 32768)/256;
+                    lanalogbufferx = (xinp.GetState().Gamepad.LeftThumbX + 32768) / 256;
+                    lanalogbuffery = (xinp.GetState().Gamepad.LeftThumbY + 32768) / 256;
 
-                    ranalogbufferx = (xinp.GetState().Gamepad.RightThumbX + 32768)/256;
-                    ranalogbuffery = (xinp.GetState().Gamepad.RightThumbY + 32768)/256;
+                    ranalogbufferx = (xinp.GetState().Gamepad.RightThumbX + 32768) / 256;
+                    ranalogbuffery = (xinp.GetState().Gamepad.RightThumbY + 32768) / 256;
 
-                    ltriggerbuffer = (xinp.GetState().Gamepad.LeftTrigger)/2;
-                    rtriggerbuffer = (xinp.GetState().Gamepad.RightTrigger)/2;
+                    ltriggerbuffer = (xinp.GetState().Gamepad.LeftTrigger) / 2;
+                    rtriggerbuffer = (xinp.GetState().Gamepad.RightTrigger) / 2;
 
                     xinp.SetVibration(P1VibrationOutput);
                 }
                 catch
                 {
+                    
                 }
 
                 Console.WriteLine("LS - X: {0}, Y: {0} -- ", lanalogbufferx, lanalogbuffery);
@@ -127,11 +140,11 @@ namespace AnalogControl
                     }
                     else
                     {
-                        
+
                     }
                 }
 
-                
+
 
 
                 //if (udpbuf[0].ToString())
@@ -146,12 +159,12 @@ namespace AnalogControl
                 sendbuffer = new byte[9];
 
                 sendbuffer[0] = 141;
-                sendbuffer[1] = (byte) lanalogbufferx;
-                sendbuffer[2] = (byte) lanalogbuffery;
-                sendbuffer[3] = (byte) ranalogbufferx;
-                sendbuffer[4] = (byte) ranalogbuffery;
-                sendbuffer[5] = (byte) ltriggerbuffer;
-                sendbuffer[6] = (byte) rtriggerbuffer;
+                sendbuffer[1] = (byte)lanalogbufferx;
+                sendbuffer[2] = (byte)lanalogbuffery;
+                sendbuffer[3] = (byte)ranalogbufferx;
+                sendbuffer[4] = (byte)ranalogbuffery;
+                sendbuffer[5] = (byte)ltriggerbuffer;
+                sendbuffer[6] = (byte)rtriggerbuffer;
 
                 if (udp.Send(sendbuffer, 9, ip) > 0)
                 {
