@@ -19,10 +19,6 @@ namespace AnalogControl
 
         public static IPAddress outaddress;
 
-        public void UpdateItems(MainWindow window)
-        {
-            
-        }
 
         [STAThread]
         private static void Main(string[] args)
@@ -52,10 +48,6 @@ namespace AnalogControl
             IPEndPoint ip = new IPEndPoint(outaddress, Port);
             var udp = new UdpClient(ip);
 
-            foreach (var dev in devices)
-            {
-                Console.WriteLine(dev.ProductName);
-            }
             var udpbuf = new byte[1];
 
             var lanalogbufferx = 0;
@@ -113,8 +105,8 @@ namespace AnalogControl
                 }
 
                 Console.WriteLine("LS - X: {0}, Y: {0} -- ", lanalogbufferx, lanalogbuffery);
-                Console.Write("RS - X: {0}, Y: {0}", ranalogbufferx, ranalogbuffery);
-                Console.CursorTop--;
+                Console.WriteLine("RS - X: {0}, Y: {0}", ranalogbufferx, ranalogbuffery);
+                Console.CursorTop-=2;
 
                 P1VibrationOutput.LeftMotorSpeed = 0;
                 P1VibrationOutput.RightMotorSpeed = 0;

@@ -21,7 +21,6 @@ namespace AnalogControl
         private void MainWindow_Load(object sender, EventArgs e)
         {
             Console.Title = "AnaLua Controller Server";
-            Console.WriteLine(comboBox1.SelectedIndex - 1);
             comboBox1.SelectedIndex = 0;
             textBox1.Text = "3478";
             textBox2.Text = "127.0.0.1";
@@ -39,7 +38,7 @@ namespace AnalogControl
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Console.WriteLine(comboBox1.SelectedIndex);
+            //Console.WriteLine(comboBox1.SelectedIndex);
             
         }
 
@@ -47,24 +46,22 @@ namespace AnalogControl
         {
             if (!UInt16.TryParse(textBox1.Text, out Program.Port))
             {
-                MessageBox.Show("Error", "Invalid Port", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Invalid Port", "Invalid Port", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             else if (!IPAddress.TryParse(textBox2.Text, out Program.outaddress))
             {
-                MessageBox.Show("Error", "Invalid IP Address", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Invalid IP Address", "Invalid IP Address", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             else if (comboBox1.SelectedIndex < 0)
             {
-                MessageBox.Show("Error", "No controller selected", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("No controller selected", "No controller selected", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } else
             {
                 Program.XInpPlayerIndex = comboBox1.SelectedIndex;
                 this.Close();
             }
-
-            
         }
     }
 }

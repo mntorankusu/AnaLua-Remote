@@ -63,11 +63,11 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(215, 49);
+            this.button1.Location = new System.Drawing.Point(58, 110);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 3;
-            this.button1.Text = "Update";
+            this.button1.Text = "Confirm";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -102,7 +102,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(311, 113);
+            this.ClientSize = new System.Drawing.Size(201, 147);
             this.ControlBox = false;
             this.Controls.Add(this.button1);
             this.Controls.Add(this.textBox2);
