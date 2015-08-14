@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net;
@@ -13,55 +14,48 @@ namespace AnalogControl
 {
     public partial class MainWindow : Form
     {
+
+        Network network;
+        public ConfigWindow config;
+        public string outip = "127.0.0.1";
+        public UInt16 outport = 3478;
+        public int controllerindex = -0;
+
+        public List<GenericController> controllers;
+
         public MainWindow()
         {
             InitializeComponent();
+            network = new Network();
+            config = new ConfigWindow(this);
+            backgroundWorker1_DoWork(this, new DoWorkEventArgs(null));
+            controllers = GenericController.FindControllers();
         }
 
-        private void MainWindow_Load(object sender, EventArgs e)
+        private void textBox3_TextChanged(object sender, EventArgs e)
         {
-            Console.Title = "AnaLua Controller Server";
-            comboBox1.SelectedIndex = 0;
-            textBox1.Text = "3478";
-            textBox2.Text = "127.0.0.1";
+
         }
 
-        public void AddItemToComboBox(string item)
+        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
-            comboBox1.Items.Add(item);
-        }
+            if (controllerindex > 0)
+            { 
+                textBox1.Text = String.Format("XInput Controller {0}", controllerindex);
+            } else
+            {
+                textBox1.Text = "No controller";
+            }
 
-        private void comboBox1_SelectedValueChanged(object sender, EventArgs e)
-        {
-            
-        }
-
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            //Console.WriteLine(comboBox1.SelectedIndex);
-            
+            textBox2.Text = outip;
+            textBox3.Text = outport.ToString();
+            Thread.Sleep(8);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (!UInt16.TryParse(textBox1.Text, out Program.Port))
-            {
-                MessageBox.Show("Invalid Port", "Invalid Port", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            else if (!IPAddress.TryParse(textBox2.Text, out Program.outaddress))
-            {
-                MessageBox.Show("Invalid IP Address", "Invalid IP Address", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            else if (comboBox1.SelectedIndex < 0)
-            {
-                MessageBox.Show("No controller selected", "No controller selected", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            } else
-            {
-                Program.XInpPlayerIndex = comboBox1.SelectedIndex;
-                this.Close();
-            }
+            config.ShowDialog(this);
+            textBox1.Text = controllers[controllerindex].type;
         }
     }
 }

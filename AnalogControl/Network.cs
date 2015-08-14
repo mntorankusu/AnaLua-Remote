@@ -3,20 +3,17 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 
-/*namespace AnalogControl
+namespace AnalogControl
 {
     internal class Network
     {
-        private readonly UdpClient udp;
+        private UdpClient udp;
         private IPEndPoint _ip;
 
         public Network()
         {
             _ip = new IPEndPoint(IPAddress.Loopback, 3478);
             udp = new UdpClient(_ip);
-            udp.Connect(_ip);
-            //udp.Client.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.Broadcast, true);
-            //udp.Client.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.ReuseAddress, true);
         }
 
         public List<byte[]> Receive()
@@ -41,11 +38,14 @@ using System.Net.Sockets;
 
         public bool Send(byte[] message)
         {
-            if (udp.Send(message, message.Length) > 0)
+            if (udp.Send(message, message.Length, _ip) > 0)
             {
                 return true;
+            } else
+            {
+                Console.WriteLine("UDP Send Error");
             }
             return false;
         }
     }
-}*/
+}

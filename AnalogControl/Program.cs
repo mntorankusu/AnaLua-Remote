@@ -13,11 +13,11 @@ namespace AnalogControl
     internal class Program
     {
         static List<Controller> xinputcontrollers = new List<Controller>();
-        static public int XInpPlayerIndex = -1;
+        static public int XInpPlayerIndex = 0;
 
-        public static UInt16 Port = 0;
+        public static UInt16 Port = 3478;
 
-        public static IPAddress outaddress;
+        public static IPAddress outaddress = IPAddress.Loopback;
 
 
         [STAThread]
@@ -31,7 +31,8 @@ namespace AnalogControl
                 if (new Controller((UserIndex)i).IsConnected)
                 {
                     xinputcontrollers.Add(new Controller((UserIndex)i));
-                    TheMainForm.AddItemToComboBox(String.Format("Xinput Controller (Player Index {0})", i+1));
+                    Console.WriteLine(xinputcontrollers[i].GetHashCode());
+                    //TheConfigForm.AddItemToComboBox(String.Format("Xinput Controller ({0})", i+1));
                 }
             }
 
@@ -80,8 +81,6 @@ namespace AnalogControl
             //Mouse Left, Mouse Right, Mouse Middle, Mouse scroll up, Mouse scroll down, X1, X2
 
             Console.WriteLine("AnaLua Controller Server (Generic Version 0.01)");
-            Console.WriteLine("Sends input from the first connected controller to localhost:3478");
-            Console.WriteLine("And receives force feedback commands on the same port.");
 
             while (true)
             {
@@ -104,9 +103,10 @@ namespace AnalogControl
                     
                 }
 
-                Console.WriteLine("LS - X: {0}, Y: {0} -- ", lanalogbufferx, lanalogbuffery);
-                Console.WriteLine("RS - X: {0}, Y: {0}", ranalogbufferx, ranalogbuffery);
-                Console.CursorTop-=2;
+                Console.WriteLine("LS - X: {0}  Y: {0}      ", lanalogbufferx, lanalogbuffery);
+                Console.WriteLine("RS - X: {0}  Y: {0}      ", ranalogbufferx, ranalogbuffery);
+                Console.WriteLine("LT: {0}  RT: {0}      ", ltriggerbuffer, rtriggerbuffer);
+                Console.CursorTop-=3;
 
                 P1VibrationOutput.LeftMotorSpeed = 0;
                 P1VibrationOutput.RightMotorSpeed = 0;

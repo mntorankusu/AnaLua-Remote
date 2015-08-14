@@ -10,8 +10,24 @@ using SharpDX.XInput;
 
 namespace AnalogControl
 {
-    class GenericController
+
+    public class GenericController
     {
+
+        public static List<GenericController> FindControllers()
+        {
+            var list = new List<GenericController>();
+            for (int i = 0; i < 4; i++)
+            {
+                if (new Controller((UserIndex)i).IsConnected)
+                {
+                    list.Add(new XInputController(new Controller((UserIndex)i)));
+                }
+            }
+
+            return list;
+        }
+
         public string type = "none";
         public virtual bool Vibration(int Length)
         {
@@ -24,7 +40,7 @@ namespace AnalogControl
         }
     }
 
-    class DInputController : GenericController
+    public class DInputController : GenericController
     {
         private Joystick controller;
         private JoystickState controllerstate;
@@ -49,7 +65,7 @@ namespace AnalogControl
         }   
     }
 
-    class XInputController : GenericController
+    public class XInputController : GenericController
     {
         private Controller controller;
         private State controllerstate;
