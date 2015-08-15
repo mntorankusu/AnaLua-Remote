@@ -25,6 +25,8 @@ namespace AnalogControl
         {
             Console.Title = "AnaLua Controller Configuration";
 
+            comboBox1.Items.Clear();
+
             textBox1.Text = mainwindow.outport.ToString();
             textBox2.Text = mainwindow.outip.ToString();
 
@@ -78,13 +80,13 @@ namespace AnalogControl
             } else
             {
                 mainwindow.controllerindex = comboBox1.SelectedIndex;
-                this.Hide();
+                this.Close();
             }
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            this.Hide();
+            this.Close();
         }
     }
 }

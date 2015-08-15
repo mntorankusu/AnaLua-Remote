@@ -20,16 +20,17 @@ namespace AnalogControl
         public string outip = "127.0.0.1";
         public UInt16 outport = 3478;
         public int controllerindex = -0;
-
+        public bool workerActive = false;
+        
         public List<GenericController> controllers;
 
         public MainWindow()
         {
             InitializeComponent();
-            network = new Network();
             config = new ConfigWindow(this);
-            backgroundWorker1_DoWork(this, new DoWorkEventArgs(null));
             controllers = GenericController.FindControllers();
+            workerActive = true;
+            backgroundWorker1.RunWorkerAsync();
         }
 
         private void textBox3_TextChanged(object sender, EventArgs e)
@@ -39,22 +40,32 @@ namespace AnalogControl
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
-            if (controllerindex > 0)
-            { 
-                textBox1.Text = String.Format("XInput Controller {0}", controllerindex);
-            } else
+            Console.WriteLine("Init background thread");
+
+            network = new Network(outip, outport);
+
+            while (true)
             {
-                textBox1.Text = "No controller";
+                if (!workerActive) { break; }
+
+                Thread.Sleep(1);
+
+                controllers[controllerindex].Update();
             }
 
-            textBox2.Text = outip;
-            textBox3.Text = outport.ToString();
-            Thread.Sleep(8);
+            network.Close();
+
+            Console.WriteLine("End background thread");
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            workerActive = false;
             config.ShowDialog(this);
+
+            workerActive = true;
+            backgroundWorker1.RunWorkerAsync();
+
             textBox1.Text = controllers[controllerindex].type;
         }
     }

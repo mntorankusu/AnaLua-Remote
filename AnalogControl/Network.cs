@@ -7,24 +7,31 @@ namespace AnalogControl
 {
     internal class Network
     {
-        private UdpClient udp;
+        private UdpClient _udp;
         private IPEndPoint _ip;
 
-        public Network()
+        public Network(string ip, UInt16 port)
         {
-            _ip = new IPEndPoint(IPAddress.Loopback, 3478);
-            udp = new UdpClient(_ip);
+            _ip = new IPEndPoint(IPAddress.Parse(ip), port);
+            _udp = new UdpClient(_ip);
+            Console.WriteLine("Started UDP");
+        }
+
+        public void Close()
+        {
+            _udp.Close();
+            Console.WriteLine("Closed UDP");
         }
 
         public List<byte[]> Receive()
         {
             var messages = new List<byte[]>();
             var udpbuf = new byte[0];
-            while (udp.Available > 0)
+            while (_udp.Available > 0)
             {
                 try
                 {
-                    udpbuf = udp.Receive(ref _ip);
+                    udpbuf = _udp.Receive(ref _ip);
                     messages.Add(udpbuf);
                 }
                 catch
@@ -38,7 +45,7 @@ namespace AnalogControl
 
         public bool Send(byte[] message)
         {
-            if (udp.Send(message, message.Length, _ip) > 0)
+            if (_udp.Send(message, message.Length, _ip) > 0)
             {
                 return true;
             } else

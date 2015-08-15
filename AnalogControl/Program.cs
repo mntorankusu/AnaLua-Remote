@@ -12,7 +12,6 @@ namespace AnalogControl
 {
     internal class Program
     {
-        static List<Controller> xinputcontrollers = new List<Controller>();
         static public int XInpPlayerIndex = 0;
 
         public static UInt16 Port = 3478;
@@ -25,19 +24,8 @@ namespace AnalogControl
         {
             Application.EnableVisualStyles();
             MainWindow TheMainForm = new MainWindow();
-
-            for (int i = 0; i <= 3; i++)
-            {
-                if (new Controller((UserIndex)i).IsConnected)
-                {
-                    xinputcontrollers.Add(new Controller((UserIndex)i));
-                    Console.WriteLine(xinputcontrollers[i].GetHashCode());
-                    //TheConfigForm.AddItemToComboBox(String.Format("Xinput Controller ({0})", i+1));
-                }
-            }
-
             Application.Run(TheMainForm);
-
+            /*
             Controller xinp = xinputcontrollers[XInpPlayerIndex];
 
             var P1VibrationOutput = new Vibration();
@@ -164,7 +152,7 @@ namespace AnalogControl
                 }
 
                 Thread.Sleep(8);
-            }
+            }*/
         }
     }
 }
