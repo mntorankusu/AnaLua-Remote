@@ -19,7 +19,7 @@ namespace AnalogControl
         public ConfigWindow config;
         public string outip = "127.0.0.1";
         public UInt16 outport = 3478;
-        public int controllerindex = -0;
+        public int controllerindex = 0;
         public bool workerActive = false;
         
         public List<GenericController> controllers;
@@ -31,6 +31,10 @@ namespace AnalogControl
             controllers = GenericController.FindControllers();
             workerActive = true;
             backgroundWorker1.RunWorkerAsync();
+
+            textBox1.Text = controllers[controllerindex].type;
+            textBox2.Text = outip;
+            textBox3.Text = outport.ToString();
         }
 
         private void textBox3_TextChanged(object sender, EventArgs e)
@@ -43,6 +47,7 @@ namespace AnalogControl
             Console.WriteLine("Init background thread");
 
             network = new Network(outip, outport);
+            List<byte[]> recv_buffer;
 
             while (true)
             {
@@ -50,8 +55,25 @@ namespace AnalogControl
 
                 Thread.Sleep(1);
 
+                recv_buffer = network.Receive();
+
+                foreach (byte[] message in recv_buffer)
+                {
+                    if (message.Length > 0) {  }
+                }
+
+                if(controllers[controllerindex].changed)
+                {
+                    Console.WriteLine("Ch ch ch changin");
+                    network.Send(controllers[controllerindex].datagram);
+                }
+
                 controllers[controllerindex].Update();
+
+                Thread.Sleep(1);
             }
+
+           
 
             network.Close();
 

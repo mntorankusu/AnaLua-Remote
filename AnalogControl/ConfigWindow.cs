@@ -23,10 +23,7 @@ namespace AnalogControl
 
         private void MainWindow_Load(object sender, EventArgs e)
         {
-            Console.Title = "AnaLua Controller Configuration";
-
             comboBox1.Items.Clear();
-
             textBox1.Text = mainwindow.outport.ToString();
             textBox2.Text = mainwindow.outip.ToString();
 
